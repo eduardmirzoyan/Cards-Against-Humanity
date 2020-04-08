@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import styled from '@emotion/styled';
 import WhiteCard from '../components/WhiteCard';
+import WhiteDeck from '../helpers/WhiteDeck'
+
 
 const Table = styled.table({
     width: '100%',
@@ -31,7 +33,7 @@ const Hand = styled.div({
     alignItems:'center',
 })
 
-const ConfirmationButton = styled.div({
+const ConfirmationContainer = styled.div({
     width: '100%',
     height: 50,
 
@@ -49,9 +51,44 @@ const PlayerList = styled.div({
     alignItems:'center',
 })
 
+const ConfirmationButton = styled.button`
+    background-color: grey;
+    width: 200px;
+    height: 100%;
+    border: 1px solid black;
+    transition: 0.3s;
+    opacity: 0.6;
+    cursor: pointer;
+    text-decoration: none;
+
+    :hover {
+        opacity: 1;
+    }
+`
+
 class Game extends Component {
+    
+    state = {
+        whiteDeck: new WhiteDeck(),
+        playerHand: [],
+        playingField: [new WhiteCard()],
+    };
+
+    draw() {
+        const card = this.state.whiteDeck.getCard();
+        this.setState((prevState) => ({
+            playerHand: prevState.playerHand.concat(card),
+        }));
+    }
+
+    temp () {
+        for(let i = 0; i < this.state.playerHand.length; i++) {
+            console.log(this.state.playerHand[i])
+        }
+    }
 
     render() {
+        
         return (
 
             <Table>
@@ -70,24 +107,21 @@ class Game extends Component {
                     <StyledCell colSpan='1'>
                         <Container>
                             <WhiteCard/>
-                            
                         </Container>
                     </StyledCell>
 
                     <StyledCell colSpan='3'>
                         <Container>
-                            <WhiteCard/>
-                            <WhiteCard/>
-                            <WhiteCard/>
+                            {this.state.playingField[0].render()}
                         </Container>
                     </StyledCell>
                 </StyledRow>
 
                 <StyledRow>
                     <StyledCell colSpan='4'>
-                        <ConfirmationButton>
-                            <div style={{width: 200, height: '100%', border: '1px solid black'}}/>
-                        </ConfirmationButton>
+                        <ConfirmationContainer>
+                            <ConfirmationButton onClick={() => (this.draw())}/>
+                        </ConfirmationContainer>
                     </StyledCell>
                 </StyledRow>
 
@@ -95,13 +129,9 @@ class Game extends Component {
                 <StyledRow>
                     <StyledCell colSpan='4'>
                         <Hand>
-                            <WhiteCard/>
-                            <WhiteCard/>
-                            <WhiteCard/>
-                            <WhiteCard/>
-                            <WhiteCard/>
-                            <WhiteCard/>
-                            <WhiteCard/>
+                            {this.state.playerHand.map((value, index)=>(
+                                <WhiteCard text={(typeof(value) === 'undefined' ? 'Unknown Text' : value.text)} id={index}/>
+                            ))}
                         </Hand>
                     </StyledCell>
                 </StyledRow>
@@ -112,18 +142,3 @@ class Game extends Component {
 }
 
 export default Game;
-
-
-
-
-
-
-
-//temp stuff 
-
-/*
-import WhiteCard from '../components/WhiteCard';
-
-
-
-*/

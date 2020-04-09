@@ -69,28 +69,38 @@ const ConfirmationButton = styled.button`
 class Game extends Component {
     
     state = {
-        whiteDeck: new WhiteDeck(),
-        playerHand: [],
-        playingField: [new WhiteCard()],
+        whiteDeck: this.props.data.whiteDeck,
+        playerHand: [{text: 'text1', id: 1}, {text: 'text2', id: 1}],
+        playingField: [],
     };
 
-    draw() {
-        const card = this.state.whiteDeck.getCard();
+    drawCard() {
+        const card = this.getCard();
         this.setState((prevState) => ({
             playerHand: prevState.playerHand.concat(card),
         }));
     }
 
-    temp () {
-        for(let i = 0; i < this.state.playerHand.length; i++) {
-            console.log(this.state.playerHand[i])
-        }
+    getCard() {
+        const randomIndex = Math.floor(Math.random() * this.state.whiteDeck.length); // Get random number through the size of the deck
+        const removedCard = this.state.whiteDeck.splice(randomIndex, 1); // Remove the element
+        return removedCard[0]; // return the element removed
+    }
+
+    moveCard() {
+        const card = this.state.playerHand.splice(0, 1);
+        this.setState({
+            playingField: this.state.playingField.concat(card),
+        });
+    }
+
+    handleSelectedCard() {
+        // Work in progress
     }
 
     render() {
         
         return (
-
             <Table>
                 <StyledRow>
                     <StyledCell colSpan='4'>
@@ -112,7 +122,9 @@ class Game extends Component {
 
                     <StyledCell colSpan='3'>
                         <Container>
-                            {this.state.playingField[0].render()}
+                            {this.state.playingField.map((card, index)=>(
+                                <WhiteCard text={(typeof(card) === 'undefined' ? 'Unknown Text' : card.text)} id={index}/>
+                            ))}
                         </Container>
                     </StyledCell>
                 </StyledRow>
@@ -120,17 +132,17 @@ class Game extends Component {
                 <StyledRow>
                     <StyledCell colSpan='4'>
                         <ConfirmationContainer>
-                            <ConfirmationButton onClick={() => (this.draw())}/>
+                            <ConfirmationButton onClick={() => {this.drawCard() }  }/>
+
                         </ConfirmationContainer>
                     </StyledCell>
                 </StyledRow>
 
-
                 <StyledRow>
                     <StyledCell colSpan='4'>
                         <Hand>
-                            {this.state.playerHand.map((value, index)=>(
-                                <WhiteCard text={(typeof(value) === 'undefined' ? 'Unknown Text' : value.text)} id={index}/>
+                            {this.state.playerHand.map((card, index)=>(
+                                <WhiteCard text={(typeof(card) === 'undefined' ? 'Unknown Text' : card.text)} id={index} />
                             ))}
                         </Hand>
                     </StyledCell>

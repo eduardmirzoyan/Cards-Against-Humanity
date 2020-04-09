@@ -4,11 +4,12 @@ import './index.css';
 import App from './App';
 import Game from './states/Game';
 import * as serviceWorker from './serviceWorker';
+import data from './helpers/data';
 
 ReactDOM.render(
   <React.StrictMode>
     <header style={{height: 100}}/>
-    <Game />
+    <Game data={data} />
   </React.StrictMode>,
   document.getElementById('root')
 );

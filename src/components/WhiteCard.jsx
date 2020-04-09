@@ -21,28 +21,27 @@ const CardWrapper = styled.button`
 
 class WhiteCard extends Component {
 
-    constructor(message) {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
-            text: "" + message,
+            text: props.text,
             selected: false,
         }
     }
 
-    toggle() {
+    handleSelect() {
         this.setState((prevState)=>({
             selected: !prevState.selected,
         }));
-        this.forceUpdate();
     }
 
     render() {
         return (
-            <CardWrapper onClick={()=>(this.toggle())} style={{backgroundColor: (this.state.selected ? 'grey': 'white')}} >
+            <CardWrapper onClick={()=>(this.handleSelect())} style={{backgroundColor: (this.state.selected ? 'grey': 'white')}} >
                 <p> {this.state.text} </p>
             </CardWrapper>
         );
     }
 }
-// 
+
 export default WhiteCard;

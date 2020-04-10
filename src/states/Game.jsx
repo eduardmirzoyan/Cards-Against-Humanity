@@ -66,14 +66,24 @@ const ConfirmationButton = styled.button`
     }
 `
 
+// A card object is one with a text and id field ***
 class Game extends Component {
-    
-    state = {
-        whiteDeck: this.props.data.whiteDeck,
-        playerHand: [{text: 'text1', id: 1}, {text: 'text2', id: 1}],
-        playingField: [],
-    };
 
+    constructor(props){
+        super(props);
+        this.handleSelectedCards = this.handleSelectedCards.bind(this);
+
+        this.state = {
+            whiteDeck: props.data.whiteDeck, // Imports deck of white cards, with a text and id
+            playerHand: [], // An array of this players had with card objects
+            playingField: [], // An array of the top right set of card objects to be played
+            selectedCards: [], // Array of indexes of cards in playerhand to be played
+
+            isPlayersTurn: true, // Is it this players turn to play a white card
+        };
+    }
+
+    // Randomly chooses a white card from white card deck and adds it to players hand
     drawCard() {
         const card = this.getCard();
         this.setState((prevState) => ({
@@ -81,25 +91,63 @@ class Game extends Component {
         }));
     }
 
+    // Randomly selects a card from the white card deck
     getCard() {
         const randomIndex = Math.floor(Math.random() * this.state.whiteDeck.length); // Get random number through the size of the deck
         const removedCard = this.state.whiteDeck.splice(randomIndex, 1); // Remove the element
         return removedCard[0]; // return the element removed
     }
 
-    moveCard() {
-        const card = this.state.playerHand.splice(0, 1);
-        this.setState({
-            playingField: this.state.playingField.concat(card),
-        });
+    // If a card is selected, then adds the INDEX of that card with respect to this players hand, into a temporary array then sorts the array numerically
+    // If a card is deselected, then it looks through the temporary array and removes the mention of that INDEX
+    handleSelectedCards(index, selected) {
+        if(selected){
+            this.setState((prevState) => ({
+                selectedCards: prevState.selectedCards.concat(index),
+            }));
+        }
+        else {
+            if(this.state.selectedCards.includes(index)) {
+                this.state.selectedCards.splice(this.state.selectedCards.indexOf(index), 1);
+            }
+        }
+        this.state.selectedCards.sort();
     }
 
-    handleSelectedCard() {
-        // Work in progress
+    // When the selected cards are confirmed, the cards from the temporary array are copied into the playing field and then deleted from the players hand
+    confirmSelectedCards() {
+        const array = [];
+        
+        // Copies all card objects from the players hand to a temporary array using the indexes in selected cards
+        for (let i = 0; i < this.state.selectedCards.length; i++) {
+            array.push(this.state.playerHand[this.state.selectedCards[i]]);
+        }
+        // Sorts array for safety
+        this.state.selectedCards.sort();
+        // Removes the selected cards from this players hand
+        for (let i = this.state.selectedCards.length - 1; i >= 0; i--) {
+            this.state.playerHand.splice(this.state.selectedCards[i], 1);
+        }
+
+        // Updates the playing field to include the selected cards
+        // Empties the selected cards array and then ends the players turn
+        this.setState((prevState) => ({
+            playingField: prevState.playingField.concat(array),
+            selectedCards: [],
+            isPlayersTurn: false,
+        }));
+    }
+
+    //Temporary Function
+    beginGame() {
+        this.drawCard();
+        this.drawCard();
+        this.drawCard();
+        this.drawCard();
+        this.drawCard();
     }
 
     render() {
-        
         return (
             <Table>
                 <StyledRow>
@@ -132,8 +180,8 @@ class Game extends Component {
                 <StyledRow>
                     <StyledCell colSpan='4'>
                         <ConfirmationContainer>
-                            <ConfirmationButton onClick={() => {this.drawCard() }  }/>
-
+                            <ConfirmationButton onClick={() => {this.beginGame()}}/>
+                            <ConfirmationButton onClick={() => {this.confirmSelectedCards()}}/>
                         </ConfirmationContainer>
                     </StyledCell>
                 </StyledRow>
@@ -142,7 +190,7 @@ class Game extends Component {
                     <StyledCell colSpan='4'>
                         <Hand>
                             {this.state.playerHand.map((card, index)=>(
-                                <WhiteCard text={(typeof(card) === 'undefined' ? 'Unknown Text' : card.text)} id={index} />
+                                <WhiteCard text={(typeof(card) === 'undefined' ? 'Unknown Text' : card.text)} index={index} handleSelectedCards={this.handleSelectedCards} isPlayersTurn={this.state.isPlayersTurn} />
                             ))}
                         </Hand>
                     </StyledCell>

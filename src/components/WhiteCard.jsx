@@ -21,24 +21,25 @@ const CardWrapper = styled.button`
 
 class WhiteCard extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            text: props.text,
-            selected: false,
-        }
+    state = {
+        selected: false,
     }
 
+    // Changes the state of the card from being selected and visa-versa
+    // Then calls the game's handleselectedcards function
     handleSelect() {
         this.setState((prevState)=>({
             selected: !prevState.selected,
-        }));
+        }),
+        ()=>{
+            this.props.handleSelectedCards(this.props.index, this.state.selected)
+        });
     }
 
     render() {
         return (
-            <CardWrapper onClick={()=>(this.handleSelect())} style={{backgroundColor: (this.state.selected ? 'grey': 'white')}} >
-                <p> {this.state.text} </p>
+            <CardWrapper onClick={()=>(this.handleSelect())} style={{backgroundColor: (this.state.selected && this.props.isPlayersTurn ? 'grey': 'white')}} >
+                <p> {this.props.text} </p>
             </CardWrapper>
         );
     }
